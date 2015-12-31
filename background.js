@@ -10,7 +10,6 @@ var opt={ type:"basic",
           message:"Success !"
           };
 
-// git Test
 function performNotify(operation,information) {
 	var option = null;
 	option=opt;
