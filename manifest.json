@@ -1,0 +1,35 @@
+{
+    "manifest_version": 2,
+    "name": "Auto Test",
+    "version": "0.5",
+    "background": {
+        "scripts": [
+            "background.js"
+        ]
+    },
+    "permissions": [
+        "tabs",
+        "http://*/*",
+        "https://*/*",
+        "notifications"
+    ],
+    "description": "Auto Test",
+    "browser_action": {
+        "default_popup": "popup.html",
+        "default-title": "SelectAll"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*/*"
+            ],
+            "js": [
+                "jquery.js",
+                "content.js"
+            ]
+        }
+    ],
+    "web_accessible_resources": [
+        "icon.png"
+    ]
+}
