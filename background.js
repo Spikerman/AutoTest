@@ -125,13 +125,13 @@ function openNewWindow(msg){
    
    windowNum=windowNum+1;
    var state1="var newWindow;";
-   var state2="this.verify.equal(result.value.length, "+windowNum+", 'There should be "+windowNum +"windows open');";
+   var state2="this.verify.equal(result.value.length, "+windowNum+", ' There should be "+windowNum +" windows open');";
    var state3="newWindow = result.value["+(windowNum-1)+"];";
    var state4="this.switchWindow(newWindow);";
     
    var functionBody=state1+state2+state3+state4;
    
-   var command= getWaitScript(msg.type,msg.propertyName,msg.property)+setPauseTime(1000)+".windowHandles(function(result){"+functionBody+"})";
+   var command= ".windowHandles(function(result){"+functionBody+"})";
    
    return command;
  }

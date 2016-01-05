@@ -6,14 +6,14 @@ var isclose = true;
 
 $("a").click(function (e) {
 
-    var href=$(this).attr('href');
+    var href = $(this).attr('href');
     console.log(href);
-   
+
     if (e.currentTarget.href != "") {
         port.postMessage({ type: "a", propertyName: "href", property: href });
-    } 
-    else if(e.currentTarget.title !=""){
-        port.postMessage({ type: "a", propertyName: "id", property: e.currentTarget.title});
+    }
+    else if (e.currentTarget.title != "") {
+        port.postMessage({ type: "a", propertyName: "id", property: e.currentTarget.title });
     }
     else if (e.currentTarget.id != "") {
         port.postMessage({ type: "a", propertyName: "id", property: e.currentTarget.id });
@@ -21,7 +21,7 @@ $("a").click(function (e) {
     else if (e.currentTarget.name != "") {
         port.postMessage({ type: "a", propertyName: "name", property: e.currentTarget.name });
     }
-    
+
     else if (e.currentTarget.class != "") {
         port.postMessage({ type: "a", propertyName: "name", property: e.currentTarget.class });
     }
@@ -43,7 +43,13 @@ $("button").click(function (e) {
 
 $("input").blur(function (e) {
     if (e.currentTarget.type != "submit") {
-        port.postMessage({ type: "input", propertyName: "name", property: e.currentTarget.name, value: $(this).val() });
+        if (e.currentTarget.name != "") {
+            port.postMessage({ type: "input", propertyName: "name", property: e.currentTarget.name, value: $(this).val() });
+        }
+        else if (e.currentTarget.id != "") {
+            port.postMessage({ type: "input", propertyName: "id", property: e.currentTarget.id, value: $(this).val() });
+        }
+
     }
 });
 
