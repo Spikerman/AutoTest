@@ -28,10 +28,10 @@ window.addEventListener("load", function() {
 });
 
 function notificationBtnClick(notID, iBtn) {
-    testScript=testScript+endMark;
-    alert(testScript);
+    outputScript=outputScript+endMark;
+    alert(outputScript);
     console.log("The notification '" + notID + "' had button " + iBtn + " clicked");
-    testScript=header;
+    outputScript=header;
     isProcessing=false;
     windowNum=1;
     console.log("Testing End");
@@ -49,35 +49,13 @@ function creationCallback(notID) {
 }
 
 
-function getStartUrl(){
-   chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
-   headUrl= tabs[0].url;
-   genHeaderScript(headUrl);
-   performNotify(headUrl,"");
-});
-}
-
-function getCurrentPageUrl(){
-   chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
-   currentPageUrl= tabs[0].url;
-});
-}
-
-//add the missing part of the url if need
- function getCurrentLinkUrl(linkUrl){
-     var regx=new RegExp('http','i');
-     if(linkUrl.search(regx)==1){
-         linkUrl=currentPageUrl+linkUrl;
-     }
-     return linkUrl;
- }
 
 chrome.runtime.onMessage.addListener(
     function(request,sender,sendResponse)
     {
        if (request.command=="start") {
            isProcessing=true;
-           getStartUrl();
+           getStartPageUrl();
            performNotify("Auto Test Start","");
            console.log("Testing Start");
        } else if(request.command=="stop")
@@ -122,7 +100,9 @@ function genWaitBodyScript(){
 }
 
 function openNewWindow(msg){
+   var command="";
    
+   if(msg.openNewTab==true){
    windowNum=windowNum+1;
    var state1="var newWindow;";
    var state2="this.verify.equal(result.value.length, "+windowNum+", ' There should be "+windowNum +" windows open');";
@@ -131,7 +111,8 @@ function openNewWindow(msg){
     
    var functionBody=state1+state2+state3+state4;
    
-   var command= ".windowHandles(function(result){"+functionBody+"})";
+   command= ".windowHandles(function(result){"+functionBody+"})";
+   }
    
    return command;
  }
@@ -139,11 +120,33 @@ function openNewWindow(msg){
 //generate the header script of the test
 function genHeaderScript(url){
     header="module.exports = {'Auto Test' : function (browser) {browser.url('"+url+"').waitForElementVisible('body', 1000)";
-    testScript=header;
+    outputScript=header;
     console.log("current Url: "+header);
  }
  
- 
+ //notify the current website url when the extension starts
+ function getStartPageUrl(){
+   chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
+   headUrl= tabs[0].url;
+   genHeaderScript(headUrl);
+   performNotify(headUrl,"");
+});
+}
+
+// function getCurrentPageUrl(){
+//    chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
+//    currentPageUrl= tabs[0].url;
+// });
+// }
+
+//adding missing part of url if needed ----no use
+ function getCurrentLinkUrl(linkUrl){
+     var regx=new RegExp('http','i');
+     if(linkUrl.search(regx)==(-1)){
+         linkUrl=currentPageUrl+linkUrl;
+     }
+     return linkUrl;
+ }
 
 var closeMark = ".closeWindow()";
 var endMark = ".pause(10000).end();}};";
@@ -151,7 +154,7 @@ var header
 var windowNum=1;
 
 //initialize the testScript with header script
-var testScript;
+var outputScript;
 
 
 chrome.runtime.onConnect.addListener(function(port) {
@@ -160,13 +163,8 @@ chrome.runtime.onConnect.addListener(function(port) {
   	port.onMessage.addListener(function(msg) {
         if(isProcessing==true){
           
-          // handle the "open new tab" action 
-          if(msg.type == "a" || msg.type == "button"){
-            
-         //   getCurrentUrl();
-         //   msg.property=getLinkUrl(msg);
-            
-            testScript=testScript
+          if(msg.type == "a"){
+             outputScript=outputScript
             +getWaitScript(msg.type,msg.propertyName,msg.property)
             +getClickScript(msg.type,msg.propertyName,msg.property)
             +setPauseTime(1000)
@@ -174,29 +172,40 @@ chrome.runtime.onConnect.addListener(function(port) {
             +genWaitBodyScript()
             +setPauseTime(1000);
             
-            performNotify("Click Operation",testScript);
+            performNotify("Link Click Operation",outputScript);
             
   		}
-  		else if(msg.type == "submit"){
-  			testScript = testScript+ getWaitScript("input",msg.propertyName,msg.property)
+     
+        else if(msg.type == "button"){ //without handling new window here
+             outputScript=outputScript
+            +getWaitScript(msg.type,msg.propertyName,msg.property)
+            +getClickScript(msg.type,msg.propertyName,msg.property)
+            +setPauseTime(1000)
+            +genWaitBodyScript()
+            +setPauseTime(1000);
+            
+            performNotify("Button Click Operation",outputScript);
+        }
+  	
+      	else if(msg.type == "submit"){
+  			outputScript = outputScript+ getWaitScript("input",msg.propertyName,msg.property)
               +getClickScript("input",msg.propertyName,msg.property)
               +setPauseTime(1000)+genWaitBodyScript()
               +openNewWindow(msg);
-            
-            performNotify("Submit Operation",testScript);
+            performNotify("Submit Operation",outputScript);
   		}
   		else if(msg.type == "input"){
-  			testScript = testScript 
+  			outputScript = outputScript 
               + getWaitScript(msg.type,msg.propertyName,msg.property) 
               + setInputValue(msg.type,msg.propertyName,msg.property,msg.value)
               + setPauseTime(1000);
            
-            performNotify("Input Operation",testScript);
+            performNotify("Input Operation",outputScript);
   		}
   		else if(msg.type == "close"){
-  			testScript = testScript + closeMark;
+  			outputScript = outputScript + closeMark;
             
-            performNotify("Close Operation",testScript);
+            performNotify("Close Operation",outputScript);
   		}
       }
       });
