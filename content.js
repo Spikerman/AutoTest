@@ -40,6 +40,21 @@ $("a").click(function (e) {
     isclose = false;
 });
 
+//record the mouseover event
+$("a").mouseover(function (e){
+    
+    var mouseEvent="mouseover";
+    var linkHref = $(this).attr('href');
+    var isBlank =false;
+    if(e.currentTarget.target =="_blank"){
+        isBlank=true;
+    }
+    
+    if (e.currentTarget.href != "") {
+        port.postMessage({ type: "a", propertyName: "href", property: linkHref, openNewTab: isBlank, event: mouseEvent});
+    }
+});
+
 $("button").click(function (e) {
     var tabHref = document.location.href;
     if (e.currentTarget.id != "") {

@@ -86,6 +86,12 @@ function getClickScript(type, propertyName, property){
 			+"')";
 }
 
+function getMoveToElementScript(type, propertyName, property){
+    return ".moveToElement('"
+            +formatAlter(type,propertyName,property)
+            +"',0,0)";
+}
+
 function setInputValue(type, propertyName, property, value){
 	return ".setValue('"
 			+ formatAlter(type,propertyName,property)
@@ -166,7 +172,7 @@ chrome.runtime.onConnect.addListener(function(port) {
   	port.onMessage.addListener(function(msg) {
         if(isProcessing==true){
           
-          if(msg.type == "a"){
+          if(msg.type == "a"&&msg.event!="mouseover"){
              outputScript=outputScript
             +getWaitScript(msg.type,msg.propertyName,msg.property)
             +getClickScript(msg.type,msg.propertyName,msg.property)
@@ -211,7 +217,11 @@ chrome.runtime.onConnect.addListener(function(port) {
         else if(msg.type=="focus"){
             performNotify("Start Input",outputScript);
         }
-  		
+  		else if(msg.type=="a"&&msg.event=="mouseover"){
+              outputScript = outputScript
+              +getMoveToElementScript(msg.type,msg.propertyName,msg.property)
+              + setPauseTime(1000);
+          }
         else if(msg.type == "close"){
   			outputScript = outputScript + closeMark;
             
