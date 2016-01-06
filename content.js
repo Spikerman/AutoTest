@@ -68,6 +68,21 @@ $("input").blur(function (e) {
     }
 });
 
+$("input").focus(function (e){
+     
+     var tabHref = document.location.href;
+     
+     if (e.currentTarget.type != "submit") {
+        if (e.currentTarget.name != "") {
+            port.postMessage({ type: "focus", propertyName: "name", property: e.currentTarget.name, value: $(this).val(), currentUrl: tabHref });
+        }
+        else if (e.currentTarget.id != "") {
+            port.postMessage({ type: "focus", propertyName: "id", property: e.currentTarget.id, value: $(this).val() , currentUrl: tabHref });
+        }
+
+    } 
+});
+
 $("input[type=submit]").click(function (e) {
     var tabHref = document.location.href;
     port.postMessage({ type: "submit", propertyName: "type", property: e.currentTarget.type, currentUrl: tabHref, openNewTab:true });

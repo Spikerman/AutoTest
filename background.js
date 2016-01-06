@@ -159,7 +159,7 @@ var windowNum=1;
 //initialize the testScript with header script
 var outputScript;
 
-
+//handle the popup page event
 chrome.runtime.onConnect.addListener(function(port) {
   	console.assert(port.name == "hey");
 
@@ -205,9 +205,14 @@ chrome.runtime.onConnect.addListener(function(port) {
               + setInputValue(msg.type,msg.propertyName,msg.property,msg.value)
               + setPauseTime(1000);
            
-            performNotify("Input Operation",outputScript);
+            performNotify("Input Complete",outputScript);
   		}
-  		else if(msg.type == "close"){
+        
+        else if(msg.type=="focus"){
+            performNotify("Start Input",outputScript);
+        }
+  		
+        else if(msg.type == "close"){
   			outputScript = outputScript + closeMark;
             
             performNotify("Close Operation",outputScript);
