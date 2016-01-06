@@ -22,6 +22,8 @@ $("a").click(function (e) {
     if (e.currentTarget.href != "") {
         port.postMessage({ type: "a", propertyName: "href", property: linkHref, currentUrl: tabHref, openNewTab: isBlank });
     }
+    
+    //unuse
     // else if (e.currentTarget.title != "") {
     //     port.postMessage({ type: "a", propertyName: "title", property: e.currentTarget.title , currentUrl: tabHref});
     // }

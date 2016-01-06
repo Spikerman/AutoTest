@@ -60,10 +60,13 @@ chrome.runtime.onMessage.addListener(
            console.log("Testing Start");
        } else if(request.command=="stop")
        {
-           // do nothing
-       } else{
-           // do nothing
-       }
+          outputScript=outputScript+endMark;
+          alert(outputScript);
+          outputScript=header;
+          isProcessing=false;
+          windowNum=1;
+          console.log("Testing End");
+       } 
     }
 );
 
