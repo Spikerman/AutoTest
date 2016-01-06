@@ -103,13 +103,13 @@ function openNewWindow(msg){
    var command="";
    
    if(msg.openNewTab==true){
-   windowNum=windowNum+1;
-   var state1="var newWindow;";
-   var state2="this.verify.equal(result.value.length, "+windowNum+", ' There should be "+windowNum +" windows open');";
-   var state3="newWindow = result.value["+(windowNum-1)+"];";
-   var state4="this.switchWindow(newWindow);";
     
-   var functionBody=state1+state2+state3+state4;
+    windowNum=windowNum+1;
+    var state1="var newWindow;";
+    var state2="this.verify.equal(result.value.length, "+windowNum+", ' There should be "+windowNum +" windows open');";
+    var state3="newWindow = result.value["+(windowNum-1)+"];";
+    var state4="this.switchWindow(newWindow);";
+    var functionBody=state1+state2+state3+state4;
    
    command= ".windowHandles(function(result){"+functionBody+"})";
    }
@@ -188,7 +188,9 @@ chrome.runtime.onConnect.addListener(function(port) {
         }
   	
       	else if(msg.type == "submit"){
-  			outputScript = outputScript+ getWaitScript("input",msg.propertyName,msg.property)
+  			
+              msg.openNewTab=true;
+              outputScript = outputScript+ getWaitScript("input",msg.propertyName,msg.property)
               +getClickScript("input",msg.propertyName,msg.property)
               +setPauseTime(1000)+genWaitBodyScript()
               +openNewWindow(msg);

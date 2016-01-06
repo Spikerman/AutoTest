@@ -54,6 +54,7 @@ $("button").click(function (e) {
 
 $("input").blur(function (e) {
     var tabHref = document.location.href;
+    
     if (e.currentTarget.type != "submit") {
         if (e.currentTarget.name != "") {
             port.postMessage({ type: "input", propertyName: "name", property: e.currentTarget.name, value: $(this).val(), currentUrl: tabHref });
@@ -67,7 +68,7 @@ $("input").blur(function (e) {
 
 $("input[type=submit]").click(function (e) {
     var tabHref = document.location.href;
-    port.postMessage({ type: "submit", propertyName: "type", property: e.currentTarget.type, currentUrl: tabHref });
+    port.postMessage({ type: "submit", propertyName: "type", property: e.currentTarget.type, currentUrl: tabHref, openNewTab:true });
     isclose = false;
 });
 
