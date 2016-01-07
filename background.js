@@ -3,12 +3,42 @@ var notID=0;
 var isProcessing=false;
 var headUrl; 
 var currentPageUrl;
+var stepNumber=0;
 
 var opt={ type:"basic",
           iconUrl:"icon.png",
           title:"Default Operation",
           message:"Success !"
           };
+
+//handle popup.js event
+chrome.runtime.onMessage.addListener(
+    function(request,sender,sendResponse)
+    {
+       if (request.command=="start") {
+           stepNumber=0;
+           isProcessing=true;
+           getStartPageUrl();
+           performNotify("Auto Test Start","");
+           console.log("Testing Start");
+       } else if(request.command=="stop"){
+          stepNumber=0;
+          outputScript=outputScript+endMark;
+          alert(outputScript);
+          outputScript=header;
+          isProcessing=false;
+          windowNum=1;
+          console.log("Testing End");
+       } else if(request.command=="step"){
+          sendResponse({
+            msg: stepNumber
+          });
+       }
+    }
+);
+
+
+
 
 function performNotify(operation,information) {
 	var option = null;
@@ -28,6 +58,7 @@ window.addEventListener("load", function() {
 });
 
 function notificationBtnClick(notID, iBtn) {
+    stepNumber=0;
     outputScript=outputScript+endMark;
     alert(outputScript);
     console.log("The notification '" + notID + "' had button " + iBtn + " clicked");
@@ -47,28 +78,6 @@ function creationCallback(notID) {
 		}, 5000);
 	
 }
-
-
-
-chrome.runtime.onMessage.addListener(
-    function(request,sender,sendResponse)
-    {
-       if (request.command=="start") {
-           isProcessing=true;
-           getStartPageUrl();
-           performNotify("Auto Test Start","");
-           console.log("Testing Start");
-       } else if(request.command=="stop")
-       {
-          outputScript=outputScript+endMark;
-          alert(outputScript);
-          outputScript=header;
-          isProcessing=false;
-          windowNum=1;
-          console.log("Testing End");
-       } 
-    }
-);
 
 function formatAlter(type,propertyName,property){
 	return type + '[' + propertyName + '="' + property + '"]';
@@ -173,6 +182,9 @@ chrome.runtime.onConnect.addListener(function(port) {
         if(isProcessing==true){
           
           if(msg.type == "a"&&msg.event!="mouseover"){
+             
+             stepNumber=stepNumber+1;
+            
              outputScript=outputScript
             +getWaitScript(msg.type,msg.propertyName,msg.property)
             +getClickScript(msg.type,msg.propertyName,msg.property)
@@ -183,9 +195,12 @@ chrome.runtime.onConnect.addListener(function(port) {
             
             performNotify("Link Click Operation",outputScript);
             
+            
   		}
      
         else if(msg.type == "button"){ //without handling new window here
+             stepNumber=stepNumber+1;
+             
              outputScript=outputScript
             +getWaitScript(msg.type,msg.propertyName,msg.property)
             +getClickScript(msg.type,msg.propertyName,msg.property)
@@ -197,7 +212,8 @@ chrome.runtime.onConnect.addListener(function(port) {
         }
   	
       	else if(msg.type == "submit"){
-  			
+  			  
+              stepNumber=stepNumber+1;
               msg.openNewTab=true;
               outputScript = outputScript+ getWaitScript("input",msg.propertyName,msg.property)
               +getClickScript("input",msg.propertyName,msg.property)
@@ -206,7 +222,8 @@ chrome.runtime.onConnect.addListener(function(port) {
             performNotify("Submit Operation",outputScript);
   		}
   		else if(msg.type == "input"){
-  			outputScript = outputScript 
+  			  stepNumber=stepNumber+1;
+              outputScript = outputScript 
               + getWaitScript(msg.type,msg.propertyName,msg.property) 
               + setInputValue(msg.type,msg.propertyName,msg.property,msg.value)
               + setPauseTime(1000);
@@ -215,13 +232,19 @@ chrome.runtime.onConnect.addListener(function(port) {
   		}
         
         else if(msg.type=="focus"){
+            
             performNotify("Start Input",outputScript);
         }
   		else if(msg.type=="a"&&msg.event=="mouseover"){
               outputScript = outputScript
               +getMoveToElementScript(msg.type,msg.propertyName,msg.property)
-              + setPauseTime(1000);
-          }
+              + setPauseTime(500);
+        }
+        else if(msg.type=="li"){
+            outputScript = outputScript
+              +getMoveToElementScript(msg.type,msg.propertyName,msg.property)
+              +setPauseTime(500);
+        }
         else if(msg.type == "close"){
   			outputScript = outputScript + closeMark;
             

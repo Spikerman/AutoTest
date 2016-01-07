@@ -104,6 +104,15 @@ $("input[type=submit]").click(function (e) {
     isclose = false;
 });
 
+
+// no use
+// $("li").mouseover(function (e){
+//     if(e.currentTarget.class!=""){
+//         port.postMessage({ type: "li", propertyName: "class", property: e.currentTarget.class});
+//     }
+// });
+
+
 // window.onbeforeunload = function () {
 //     if (isclose == true) {
 //         port.postMessage({ type: "close" });
