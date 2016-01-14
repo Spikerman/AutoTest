@@ -11,7 +11,10 @@
         "tabs",
         "http://*/*",
         "https://*/*",
-        "notifications"
+        "notifications",
+        "storage",
+        "clipboardRead",
+        "clipboardWrite"
     ],
     "description": "Auto Test",
     "browser_action": {

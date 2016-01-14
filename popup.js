@@ -21,3 +21,11 @@ function refreshStep(){
         document.getElementById("SetpNum").innerHTML = response.msg;
     });
 }
+
+// no use
+// function showResult(){
+//     chrome.runtime.sendMessage({command: "result"},
+//     function (response){
+//         document.getElementById("script").innerHTML = response.msg;
+//     });
+// }

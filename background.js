@@ -5,11 +5,25 @@ var headUrl;
 var currentPageUrl;
 var stepNumber=0;
 
+//handle the message style
 var opt={ type:"basic",
           iconUrl:"icon.png",
           title:"Default Operation",
           message:"Success !"
           };
+
+function copyToClipboard( text ){
+                var copyDiv = document.createElement('div');
+                copyDiv.contentEditable = true;
+                document.body.appendChild(copyDiv);
+                copyDiv.innerHTML = text;
+                copyDiv.unselectable = "off";
+                copyDiv.focus();
+                document.execCommand('SelectAll');
+                document.execCommand("Copy", false, null);
+                document.body.removeChild(copyDiv);
+            }
+
 
 //handle popup.js event
 chrome.runtime.onMessage.addListener(
@@ -24,6 +38,10 @@ chrome.runtime.onMessage.addListener(
        } else if(request.command=="stop"){
           stepNumber=0;
           outputScript=outputScript+endMark;
+          storeScript(outputScript);
+          
+          copyToClipboard(outputScript);
+          
           alert(outputScript);
           outputScript=header;
           isProcessing=false;
@@ -37,6 +55,9 @@ chrome.runtime.onMessage.addListener(
     }
 );
 
+function storeScript(scriptData){
+    chrome.storage.sync.set({'result': scriptData});
+ }
 
 
 
